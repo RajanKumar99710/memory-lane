@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Memory Lane{% endblock %}
+{% block content %}
+
+<!-- Top header with new capsule button -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>📦 Your Time Capsules</h2>
+  <a href="{{ url_for('create') }}" class="btn btn-primary">➕ New Capsule</a>
+</div>
+
+<!-- Newly unlocked message -->
+{% if just_unlocked %}
+  <div class="alert alert-success">
+    🔔 You have {{ just_unlocked|length }} newly unlocked capsule{{ just_unlocked|length > 1 and 's' or '' }}!
+    <ul class="mb-0">
+      {% for c in just_unlocked %}
+        <li><a href="{{ url_for('view_capsule', capsule_id=c.id) }}">{{ c.title }}</a> is now unlocked.</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<!-- Recently unlocked banner -->
+{% if recently_unlocked %}
+  <div class="alert alert-success d-flex align-items-center" role="alert">
+    <span class="me-2">🔔</span>
+    <div>
+      <strong>{{ recently_unlocked | length }} capsule(s)</strong> unlocked in the last 24 hours!<br>
+      Check them out below.
+    </div>
+  </div>
+{% endif %}
+
+<!-- Capsule list -->
+{% if capsules %}
+  <div class="row row-cols-1 row-cols-md-2 g-4 mt-3">
+    {% for capsule in capsules %}
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ capsule.title }}</h5>
+            <p class="card-text">
+              <strong>Unlocks on:</strong><br>
+              {{ capsule.unlock_date.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+
+            {% if capsule.filenames %}
+              <p class="card-text text-muted">
+                📎 Attachments: 
+                {% for file in capsule.filenames.split(',') %}
+                  <span class="badge bg-secondary">{{ file }}</span>
+                {% endfor %}
+              </p>
+            {% endif %}
+
+            {% if capsule.unlock_date > now %}
+              <span class="badge bg-warning text-dark">⏳ Locked</span>
+            {% else %}
+              <span class="badge bg-success">✅ Unlocked</span>
+            {% endif %}
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <a href="{{ url_for('view_capsule', capsule_id=capsule.id) }}" class="btn btn-sm btn-primary">🔍 View</a>
+            <form action="{{ url_for('delete_capsule', capsule_id=capsule.id) }}" method="POST" onsubmit="return confirm('Delete this capsule?');">
+              <button class="btn btn-sm btn-danger">🗑️ Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info mt-4">
+    You haven't created any time capsules yet. <a href="{{ url_for('create') }}">Start one now!</a>
+  </div>
+{% endif %}
+
+{% endblock %}

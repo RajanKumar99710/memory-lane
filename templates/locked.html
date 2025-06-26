@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ capsule.title }}</h2>
+<p>This time capsule is still locked. It will unlock on:</p>
+<p><strong>{{ capsule.unlock_date.strftime('%Y-%m-%d %H:%M') }}</strong></p>
+<p>⏳ Come back later to read your memory!</p>
+<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+{% endblock %}
